@@ -5,7 +5,6 @@ __author__ = "ayoung"
 
 
 from IPython import embed  # embed()
-import unittest
 import urllib
 import json
 import pprint as p
@@ -33,7 +32,10 @@ class QuakeList(object):
         self.response = json.loads(content)
 
     def all(self):
-        return self.response
+        all_quakes = []
+        for quake in self.response['features']:
+            all_quakes.append(quake['properties'])
+        return all_quakes
 
     def local(self):
         local_quakes = []
@@ -53,15 +55,24 @@ class QuakeList(object):
 
 def main():
     current_quakes = QuakeList()
-    current_quakes_JSON = current_quakes.all()
-    for quake in current_quakes_JSON['features']:
-        magnitude_index = int(quake['properties']['mag'])
+    current_quakes_list = current_quakes.all()
+    embed()
+    print("== All Quakes ==\n")
+    for quake in current_quakes_list:
+        magnitude_index = int(quake['mag'])
         magnitude_name = MAGNITUDE[magnitude_index]
-        print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['properties']['mag'], quake['properties']['place'])
+        print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
     print("\n\n")
 
-    fubar = current_quakes.local()
-    p.pprint( fubar)
+    print("== Local Quakes ==\n")
+    local_quake_list = current_quakes.local()
+    for quake in local_quake_list:
+        magnitude_index = int(quake['mag'])
+        magnitude_name = MAGNITUDE[magnitude_index]
+        print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
+    print("\n\n")
+
+
 
 if __name__ == '__main__':
     main()
