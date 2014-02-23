@@ -4,7 +4,7 @@ __desc__ = "A simple program to return the most current earthquake data."
 __author__ = "ayoung"
 
 
-# from IPython import embed  # embed() -- Using PyCharm for now, so no ipython debugger
+from IPython import embed  # embed()
 import unittest
 import urllib
 import json
@@ -19,6 +19,8 @@ MAGNITUDE = {0: "Micro", 1: "Micro", 2: "Minor", 3: "Minor", 4: "Light", 5: "Mod
 class QuakeList(object):
     """
     all - return a json object containing all earthquake data
+    local - return a json object containing data for quakes in Alaska, Washington, Oregon and California
+    fubar - returns a string object, 'Fubar'
     """
     def __init__(self):
         opener = urllib.FancyURLopener({})
@@ -33,36 +35,34 @@ class QuakeList(object):
     def all(self):
         return self.response
 
+    def local(self):
+        local_quakes = []
+        for quake in self.response['features']:
+            if "Alaska" in quake['properties']['place']:
+                local_quakes.append(quake['properties'])
+            elif "Washington" in quake['properties']['place']:
+                local_quakes.append(quake['properties'])
+            elif "Oregon" in quake['properties']['place']:
+                local_quakes.append(quake['properties'])
+            elif "California" in quake['properties']['place']:
+                local_quakes.append(quake['properties'])
+        return local_quakes
+
     def fubar(self):
         return("Fubar")
 
+def main():
+    current_quakes = QuakeList()
+    current_quakes_JSON = current_quakes.all()
+    for quake in current_quakes_JSON['features']:
+        magnitude_index = int(quake['properties']['mag'])
+        magnitude_name = MAGNITUDE[magnitude_index]
+        print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['properties']['mag'], quake['properties']['place'])
+    print("\n\n")
 
-current_quakes = QuakeList()
-current_quakes_JSON = current_quakes.all()
-for quake in current_quakes_JSON['features']:
-    magnitude_index = int(quake['properties']['mag'])
-    magnitude_name = MAGNITUDE[magnitude_index]
-    print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['properties']['mag'], quake['properties']['place'])
-print("\n\n")
-
-
-
-#
-# UNIT TESTS
-#
-class QuakeListTestCast(unittest.TestCase):
-    """docstring for QuakeListTestCast"""
-    def setUp(self):
-        self.test_quakes = QuakeList()
-
-    def testAllType(self):
-        self.assertEqual(type(self.test_quakes.all()), type({1:1}))
-
-    def testAllSize(self):
-        self.assertGreater(len(self.test_quakes.all()), 0)
-
-    def testFubar(self):
-        self.assertEqual(self.test_quakes.fubar(), "Fubar")
+    fubar = current_quakes.local()
+    p.pprint( fubar)
 
 if __name__ == '__main__':
-    unittest.main()
+    main()
+
