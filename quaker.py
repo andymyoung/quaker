@@ -9,6 +9,7 @@ import urllib
 import json
 import pprint as p
 import sys
+import argparse
 
 URL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson"
 
@@ -54,25 +55,38 @@ class QuakeList(object):
         return("Fubar")
 
 def main():
+    parser = argparse.ArgumentParser(description='Description of your program')
+    parser.add_argument('-a','--area', help='local or all', required=False)
+    args = vars(parser.parse_args())
+    #embed()
+
     current_quakes = QuakeList()
     current_quakes_list = current_quakes.all()
-    embed()
-    print("== All Quakes ==\n")
-    for quake in current_quakes_list:
-        magnitude_index = int(quake['mag'])
-        magnitude_name = MAGNITUDE[magnitude_index]
-        print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
-    print("\n\n")
-
-    print("== Local Quakes ==\n")
-    local_quake_list = current_quakes.local()
-    for quake in local_quake_list:
-        magnitude_index = int(quake['mag'])
-        magnitude_name = MAGNITUDE[magnitude_index]
-        print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
-    print("\n\n")
 
 
+    if args['area'] == 'local':
+        print("== Local Quakes ==\n")
+        local_quake_list = current_quakes.local()
+        for quake in local_quake_list:
+            magnitude_index = int(quake['mag'])
+            magnitude_name = MAGNITUDE[magnitude_index]
+            print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
+        print("\n\n")
+    elif args['area'] == 'all':
+        print("== All Quakes ==\n")
+        for quake in current_quakes_list:
+            magnitude_index = int(quake['mag'])
+            magnitude_name = MAGNITUDE[magnitude_index]
+            print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
+        print("\n\n")
+    else:
+        print("== Local Quakes ==\n")
+        local_quake_list = current_quakes.local()
+        for quake in local_quake_list:
+            magnitude_index = int(quake['mag'])
+            magnitude_name = MAGNITUDE[magnitude_index]
+            print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
+        print("\n\n")
 
 if __name__ == '__main__':
     main()
