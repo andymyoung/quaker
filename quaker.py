@@ -12,9 +12,8 @@ import sys
 import argparse
 
 URL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson"
-
 MAGNITUDE = {0: "Micro", 1: "Micro", 2: "Minor", 3: "Minor", 4: "Light", 5: "Moderate", 6: "Strong", 7: "Major", 8: "!Great!", 9: "!!Great!!", 10: "!!!GREAT!!!"}
-
+LOCAL_REGIONS = ["California", "Alaska", "Oregon", "Washington"]
 
 class QuakeList(object):
     """
@@ -41,43 +40,38 @@ class QuakeList(object):
     def local(self):
         local_quakes = []
         for quake in self.response['features']:
-            if "Alaska" in quake['properties']['place']:
-                local_quakes.append(quake['properties'])
-            elif "Washington" in quake['properties']['place']:
-                local_quakes.append(quake['properties'])
-            elif "Oregon" in quake['properties']['place']:
-                local_quakes.append(quake['properties'])
-            elif "California" in quake['properties']['place']:
-                local_quakes.append(quake['properties'])
+            for region in LOCAL_REGIONS:
+                if region in quake['properties']['place']:
+                    local_quakes.append(quake['properties'])
         return local_quakes
 
     def fubar(self):
         return("Fubar")
 
 def main():
-    def print_quake(quake_list):
+    def printQuake(quake_list):
         for quake in quake_list:
             magnitude_index = int(quake['mag'])
             magnitude_name = MAGNITUDE[magnitude_index]
             print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
 
-    parser = argparse.ArgumentParser(description='Description of your program')
-    parser.add_argument('-a','--area', help='local or all', required=False)
+    parser = argparse.ArgumentParser(description='Shows recent earthquake activity')
+    parser.add_argument('-a','--area', help="Select AREA of 'local' (for PNW) or 'all' (for global)", required=False)
     args = vars(parser.parse_args())
     #embed()
 
     current_quakes = QuakeList()
     if args['area'] == 'local':
         print("== Local Quakes ==\n")
-        print_quake(current_quakes.local())
+        printQuake(current_quakes.local())
         print("\n\n")
     elif args['area'] == 'all':
         print("== All Quakes ==\n")
-        print_quake(current_quakes.all())
+        printQuake(current_quakes.all())
         print("\n\n")
     else:
         print("== Local Quakes ==\n")
-        print_quake(current_quakes.local())
+        printQuake(current_quakes.local())
         print("\n\n")
 
 if __name__ == '__main__':
