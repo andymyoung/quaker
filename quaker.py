@@ -11,14 +11,15 @@ import pprint as p
 import sys
 import argparse
 
-URL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson"
+# URL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson"
+URL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
 MAGNITUDE = {0: "Micro", 1: "Micro", 2: "Minor", 3: "Minor", 4: "Light", 5: "Moderate", 6: "Strong", 7: "Major", 8: "!Great!", 9: "!!Great!!", 10: "!!!GREAT!!!"}
 LOCAL_REGIONS = ["California", "Alaska", "Oregon", "Washington"]
 
 class QuakeList(object):
     """
     all - return a json object containing all earthquake data
-    local - return a json object containing data for quakes in Alaska, Washington, Oregon and California
+    local - return a json object containing data for quakes in states listed in LOCAL_REGIONS
     fubar - returns a string object, 'Fubar'
     """
     def __init__(self):
@@ -27,7 +28,7 @@ class QuakeList(object):
             f = opener.open(URL)
             content = f.read()
         except IOError as error:
-            print("ZOINKS! \n %s" % error)
+            print(" \n!ZOINKS!  %s" % error)
             sys.exit(0)
         self.response = json.loads(content)
 
@@ -53,7 +54,8 @@ def main():
         for quake in quake_list:
             magnitude_index = int(quake['mag'])
             magnitude_name = MAGNITUDE[magnitude_index]
-            print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
+            if magnitude_name != 'Micro': # Leave out the innumerable minor quakes for now
+                print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
 
     parser = argparse.ArgumentParser(description='Shows recent earthquake activity')
     parser.add_argument('-a','--area', help="Select AREA of 'local' (for PNW) or 'all' (for global)", required=False)
