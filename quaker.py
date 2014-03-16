@@ -10,10 +10,11 @@ import json
 import pprint as p
 import sys
 import argparse
+import time
 
 # URL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson"
 URL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
-MAGNITUDE = {0: "Micro", 1: "Micro", 2: "Minor", 3: "Minor", 4: "Light", 5: "Moderate", 6: "Strong", 7: "Major", 8: "!Great!", 9: "!!Great!!", 10: "!!!GREAT!!!"}
+MAGNITUDE = {0: "Micro", 1: "Micro", 2: "Minor", 3: "Minor", 4: "Light", 5: "Mod.", 6: "Strong", 7: "Major", 8: "!Great!", 9: "!!Great!!", 10: "!!!GREAT!!!"}
 LOCAL_REGIONS = ["California", "Alaska", "Oregon", "Washington"]
 
 class QuakeList(object):
@@ -51,28 +52,34 @@ class QuakeList(object):
 
 def main():
     def printQuake(quake_list):
+        print("Mag.\tInt.\t\t\tLocation\t\t\tTime")
+        print "=" * 82
+
         for quake in quake_list:
             magnitude_index = int(quake['mag'])
             magnitude_name = MAGNITUDE[magnitude_index]
             if magnitude_name != 'Micro': # Leave out the innumerable minor quakes for now
-                print("%s quake of intensity %1.1f reported at %s") % (magnitude_name, quake['mag'], quake['place'])
+                quake_time =  time.strftime("%a, %d %b %H:%M:%S +0000", time.localtime(float((str(quake['time'])[0:10]))))
+                #embed()
+                print("%s\t%1.1f\t%-40s%s") % (magnitude_name, quake['mag'], quake['place'], quake_time)
 
     parser = argparse.ArgumentParser(description='Shows recent earthquake activity')
     parser.add_argument('-a','--area', help="Select AREA of 'local' (for PNW) or 'all' (for global)", required=False)
     args = vars(parser.parse_args())
-    #embed()
+
 
     current_quakes = QuakeList()
+
     if args['area'] == 'local':
-        print("== Local Quakes ==\n")
+        print("\n== Local Quakes ==\n")
         printQuake(current_quakes.local())
         print("\n\n")
     elif args['area'] == 'all':
-        print("== All Quakes ==\n")
+        print("\n== All Quakes ==\n")
         printQuake(current_quakes.all())
         print("\n\n")
     else:
-        print("== Local Quakes ==\n")
+        print("\n== Local Quakes ==\n")
         printQuake(current_quakes.local())
         print("\n\n")
 

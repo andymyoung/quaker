@@ -25,5 +25,7 @@ class QuakeListTestCast(unittest.TestCase):
     def testLocalType(self):
         self.assertEqual(type(self.test_quakes.local()), type([]))
 
+
+
 if __name__ == '__main__':
     unittest.main()
